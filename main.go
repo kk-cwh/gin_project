@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	db, err := gorm.Open("mysql", "user:password@/dbname?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "homestead:secret@127.0.0.1:33060/homestead?charset=utf8mb4&parseTime=True&loc=Local")
 	fmt.Println(err)
 	defer db.Close()
 	r := app.Init()

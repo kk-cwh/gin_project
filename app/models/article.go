@@ -1,12 +1,13 @@
 package models
 
 import (
-	"time"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type Article struct {
-	gorm.Model
+	Model
 	Name     string    `json:"name" gorm:"column(name);"`
 	Addr     string    `json:"addr" gorm:"column(addr);"`
 	Age      int       `json:"age" gorm:"column(age);"`
@@ -16,6 +17,15 @@ type Article struct {
 	CreateAt time.Time `json:"create_at" gorm:"column(create_at);type(datetime)" description:"创建时间"`
 }
 
-func (f *Article) TableName() string {
-	return "articles"
+// GetArticles gets a list of articles based on paging constraints
+func GetArticles(pageNum int, pageSize int) ([]*Article, error) {
+	var articles []*Article
+	// db.LogMode(true)
+
+	err := db.Offset(pageNum).Limit(pageSize).Find(&articles).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	fmt.Println(articles)
+	return articles, nil
 }

@@ -14,7 +14,7 @@ func New(router *gin.Engine) {
 	// 简单的路由组: v1
 	v1 := router.Group("/v1")
 	{
-		v1.GET("/login", controllers.ListPage)
+		v1.GET("/login", controllers.GetAll)
 	}
 
 }
