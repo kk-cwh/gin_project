@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"gin_project/lib/setting"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/jinzhu/gorm"
 	"log"
 	"time"
@@ -11,10 +12,10 @@ import (
 var db *gorm.DB
 
 type Model struct {
-	ID         int `gorm:"primary_key" json:"id"`
-	CreatedAt  int `json:"created_at"`
-	UpdatedAt  int `json:"updated_at"`
-	DeletedAt  int `json:"deleted_at"`
+	ID         int `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
+	CreatedAt  int `json:"created_at,omitempty"`
+	UpdatedAt  int `json:"updated_at,omitempty"`
+	DeletedAt  int `json:"deleted_at,omitempty" `
 }
 
 // Setup initializes the database instance
@@ -33,8 +34,9 @@ func Setup() {
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
 		return setting.DatabaseSetting.TablePrefix + defaultTableName
 	}
+	db.LogMode(true)
 
-	db.SingularTable(true)
+	// db.SingularTable(true)
 	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
 	db.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)
 	db.Callback().Delete().Replace("gorm:delete", deleteCallback)
