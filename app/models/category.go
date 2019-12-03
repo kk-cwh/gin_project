@@ -7,7 +7,7 @@ import (
 // Category 类别
 type Category struct {
 	Model
-	Name  string `json:"name" binding:"required" gorm:"column(name);"`
+	Name  string `form:"name" json:"name" validate:"required" gorm:"column(name);"`
 }
 
 // GetALLCategory gets a list of articles based on paging constraints
@@ -27,9 +27,14 @@ func  AddCategory(c *Category) error {
 	err:= db.Create(&c).Error
 	return  err
 }
-// UpdateCategory UpdateCategory
+// UpdateCategory 更新
 func  UpdateCategory(id int , c *Category) error {
-	fmt.Println(*c)
 	err:= db.Unscoped().Model(&Category{}).Where("id = ? ", id).Update(c).Error
+	return  err
+}
+
+// DelCategory 删除
+func  DelCategoryById(id int) error {
+	err:= db.Where("id = ?", id).Delete(&Category{}).Error
 	return  err
 }

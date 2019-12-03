@@ -2,9 +2,8 @@ package controllers
 
 import (
 	"gin_project/app/models"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func GetAll(c *gin.Context) {
