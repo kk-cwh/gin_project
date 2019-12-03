@@ -2,8 +2,8 @@ package router
 
 import (
 	"gin_project/app/http/controllers"
-	"github.com/gin-gonic/gin"
 	"gin_project/app/http/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 /*
