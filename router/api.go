@@ -19,9 +19,13 @@ func New(router *gin.Engine) {
 	v1 := router.Group("/v1")
 	v1.Use(middleware.JwtAuth())
 	{
+		v1.POST("/articles", controllers.SaveArticle)
+		v1.GET("/articles", controllers.GetArticles)
+		v1.GET("/articles/:id", controllers.GetOneArticle)
+
 		v1.GET("/categories", controllers.GetAllCategory)
 		v1.POST("/categories", controllers.AddCategory)
-		v1.PUT("/categories", controllers.UpdateCategory)
+		v1.PUT("/categories/:id", controllers.UpdateCategory)
 	}
 
 }

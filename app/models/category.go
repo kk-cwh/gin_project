@@ -8,13 +8,14 @@ import (
 type Category struct {
 	Model
 	Name  string `form:"name" json:"name" validate:"required" gorm:"column(name);"`
+	Articles []Article `json:"articles" `
 }
 
 // GetALLCategory gets a list of articles based on paging constraints
 func GetAllCategory() ([]*Category, error) {
 	var categories []*Category
 
-	err := db.Unscoped().Select("id,name").Find(&categories).Error
+	err := db.Unscoped().Preload("Articles").Select("id,name").Find(&categories).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}

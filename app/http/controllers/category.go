@@ -6,6 +6,7 @@ import (
 	"gin_project/lib/request"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 // GetAllCategory all
@@ -33,30 +34,30 @@ func AddCategory(c *gin.Context) {
 	//	return
 	//}
 	//fmt.Println(category)
-	//	if err:= models.AddCategory(&category);err == nil {
-	//		c.JSON(http.StatusOK, gin.H{
-	//			"data": category,
-	//		})
-	//	}
+		if err:= models.AddCategory(&loginInput);err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"data": loginInput,
+			})
+		}
 }
 
 func UpdateCategory(c *gin.Context) {
 
-	category := &models.Category{}
-
-	if err := c.ShouldBindJSON(category); err != nil {
+	category := models.Category{}
+	if err := request.BindingValidParams(c,&category); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	//id, err1 :=  strconv.Atoi(c.Param("id"))
-	//category.ID = 1
-	//category.Name ="gogog"
-	fmt.Println(category)
-	if err := models.UpdateCategory(1, category); err == nil {
+	id,_:= strconv.Atoi(c.Param("id"))
+
+	if err := models.UpdateCategory(id, &category); err == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data": category,
 		})
+	}else {
+		fmt.Println(err.Error())
 	}
+
 }
 

@@ -1,12 +1,15 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 type User struct {
 	Model
 	Username string `form:"username" json:"username" validate:"required" gorm:"column(username);"`
 	Password string `form:"password" json:"password" validate:"required" gorm:"column(password);"`
 	State    int    `json:"state" gorm:"column(state);"`
+	Articles []Article `json:"articles"`
 }
 
 func SaveUser(u *User) error {
