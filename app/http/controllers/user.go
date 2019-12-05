@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"errors"
 	"gin_project/app/models"
-	"gin_project/lib/request"
+	"gin_project/lib/this"
 	"gin_project/lib/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -15,42 +16,37 @@ type LoginInput struct {
 
 func Login(c *gin.Context) {
 	loginInput := &LoginInput{}
-	if err := request.BindingValidParams(c, loginInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := this.BindingValidParams(c, loginInput); err != nil {
+		this.ResponseError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	dbPassword, err := util.ScryptStr(loginInput.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		this.ResponseError(c, http.StatusInternalServerError, err)
 		return
 	}
 	user, err := models.FindByUserName(loginInput.Username)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		this.ResponseError(c, http.StatusInternalServerError, err)
 		return
 	}
-	if user.Password == dbPassword && user.State == 1 {
-		claims := util.CreateCustomClaims(user.Username)
+	if user != nil && user.Password == dbPassword && user.State == 1 {
+		claims := util.CreateCustomClaims(user.ID,user.Username)
 		token, err := util.GenerateToken(&claims)
-		if err == nil {
-			c.JSON(http.StatusOK, gin.H{
-				"username": user.Username,
-				"token":    token,
-			})
-			return
-		}
+		this.Response(c, err, gin.H{"user_id":user.ID, "username": user.Username, "token": token})
+
+	} else {
+		this.ResponseError(c, http.StatusInternalServerError, errors.New("账号或密码有误"))
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "error",
-	})
+	return
 
 }
 
 func Register(c *gin.Context) {
 	inputUser := &models.User{}
 
-	if err := request.BindingValidParams(c, inputUser); err != nil {
+	if err := this.BindingValidParams(c, inputUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -63,18 +59,15 @@ func Register(c *gin.Context) {
 	}
 	user, err := models.FindByUserName(inputUser.Username)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		this.ResponseError(c, http.StatusInternalServerError, errors.New("服务异常"))
 		return
 	}
 	if user != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户名已存在"})
+		this.ResponseError(c, http.StatusBadRequest, errors.New("用户名已被使用"))
 		return
 	}
 
-	if err := models.SaveUser(inputUser); err == nil {
-		c.JSON(http.StatusOK, gin.H{"error": "", "code": 0})
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
+	err = models.SaveUser(inputUser)
+	this.Response(c, err, inputUser)
 
 }

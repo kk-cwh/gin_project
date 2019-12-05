@@ -8,15 +8,17 @@ import (
 var jwtSecret []byte
 
 type CustomClaims struct {
+	UserID int `json:"user_id"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
-
-func CreateCustomClaims(username string)  (claims CustomClaims){
+//生成自定义 Claims
+func CreateCustomClaims(userId int ,username string)  (claims CustomClaims){
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3 * time.Hour)
 
 	claims = CustomClaims{
+		userId,
 		username,
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
@@ -26,14 +28,14 @@ func CreateCustomClaims(username string)  (claims CustomClaims){
 	return
 }
 
-// GenerateToken generate tokens used for auth
+// 生成token generate tokens used for auth
 func GenerateToken(claims *CustomClaims) (string, error) {
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := tokenClaims.SignedString(jwtSecret)
 	return token, err
 }
 
-// ParseToken parsing token
+//解析token parsing token
 func ParseToken(token string) (*CustomClaims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil

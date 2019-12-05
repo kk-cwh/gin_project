@@ -2,47 +2,49 @@ package controllers
 
 import (
 	"gin_project/app/models"
-	"gin_project/lib/request"
+	"gin_project/lib/this"
+	"gin_project/lib/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
 
+type  InputArticle struct {
+	Title        string   `json:"title" validate:"required" `
+	ContentMd    string   `json:"content_md" validate:"required" `
+	ContentHTML  string   `json:"content_html" validate:"required" `
+	PageImageURL string   `json:"page_image_url" validate:"required" `
+	CategoryID   uint     `json:"category_id" validate:"required" `
+	State        int      `json:"state" validate:"required" `
+	PageView     int      `json:"page_view"  `
+}
+
 func GetArticles(c *gin.Context) {
 
 	articles, err := models.GetArticles(0, 10)
-	if err == nil {
-		c.JSON(http.StatusOK, gin.H{
-
-			"Data": articles,
-		})
-	}
+	this.Response(c,err,articles)
+   return
 
 }
 func GetOneArticle(c *gin.Context)  {
 	id,_:= strconv.Atoi(c.Param("id"))
-
 	article,err := models.GetOneArticle(id)
-
-	if err == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"Data": article,
-		})
-	}
+	this.Response(c,err,article)
+	return
 
 }
 
 func SaveArticle(c *gin.Context) {
-     article := &models.Article{}
-	if err := request.BindingValidParams(c, article); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+     inputArticle := &InputArticle{}
+	if err := this.BindingValidParams(c, inputArticle); err != nil {
+		this.ResponseError(c,http.StatusBadRequest,err)
 		return
 	}
+	article := &models.Article{}
+	util.CopyStruct(inputArticle,article)
+	article.UserID = this.Auth(c).Id
 	err := models.SaveArticle(article)
-	if err == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"Data": article,
-		})
-	}
+	this.Response(c,err,article)
+	return
 
 }

@@ -34,7 +34,8 @@ func Setup() {
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
 		return setting.DatabaseSetting.TablePrefix + defaultTableName
 	}
-	db.LogMode(true)
+	//是否输出 sql log
+	db.LogMode(setting.DatabaseSetting.SqlLog)
 
 	// db.SingularTable(true)
 	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)

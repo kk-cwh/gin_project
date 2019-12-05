@@ -26,16 +26,16 @@ func JwtAuth() gin.HandlerFunc {
 					code = 404
 				}
 			}else {
+				c.Set("user_id", claims.UserID)
 				c.Set("username", claims.Username)
 			}
 		}
 		if code != 200 {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": code,
-				"msg":  code,
+				"msg":  "token认证无效",
 				"data": data,
 			})
-
 			c.Abort()
 			return
 		}

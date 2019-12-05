@@ -7,9 +7,9 @@ import (
 )
 
 /*
-New 初始化路由
+InitRoutes 初始化路由
 */
-func New(router *gin.Engine) {
+func InitRoutes(router *gin.Engine) {
 	// 注册全局的中间件
 	router.Use(gin.Logger(), gin.Recovery(),middleware.TranslationMiddleware())
 

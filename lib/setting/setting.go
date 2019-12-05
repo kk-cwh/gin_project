@@ -45,6 +45,7 @@ type Database struct {
 	Host        string
 	Name        string
 	TablePrefix string
+	SqlLog      bool
 }
 
 var DatabaseSetting = &Database{}
